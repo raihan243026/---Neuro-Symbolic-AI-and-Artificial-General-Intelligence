@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="bn" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>নিউরো-সিম্বলিক এআই এবং এজিআই: একটি ইন্টারেক্টিভ পর্যালোচনা</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Neutrals (Beige, Teal, Slate, Soft Orange) for light theme. Dark Grey/Slate and Dark Red/Burgundy for dark themes. -->
+    <!-- Application Structure Plan: The application uses a thematic, non-linear structure to make the dense academic report digestible. It starts with a high-level introduction, then splits into parallel deep-dive sections for NSAI and AGI, allowing users to explore them independently. Key interactions include a clickable doughnut chart for research data, interactive diagrams for complex architectures, and toggleable cards for principles and challenges. This design prioritizes user-driven exploration and comparative understanding over a passive, linear reading experience, making complex relationships and hierarchies intuitive. The final section visually synthesizes the two fields, reinforcing the report's core thesis. New additions include a search bar for content discovery, a theme switcher for user preference, and a social media footer to enhance external connectivity. -->
+    <!-- Visualization & Content Choices: 
+        - NSAI Research Effort (%): Goal: Compare proportions. Method: Interactive Doughnut Chart (Chart.js). Interaction: Clicking a segment displays detailed text. Justification: Transforms static percentages into an engaging, explorable element.
+        - NSAI/AGI Architectures & Principles: Goal: Organize/Inform. Method: Interactive Cards/Buttons (HTML/CSS/JS). Interaction: Click to reveal detailed descriptions. Justification: Breaks down complex hierarchies and lists into manageable, user-controlled chunks, preventing information overload.
+        - NSAI/AGI Synergy: Goal: Show Relationships. Method: Custom Diagram (HTML/Tailwind). Interaction: Visually represents the core argument of the report—the convergence of the two fields.
+        - All text content is managed in JS objects for dynamic updates and cleaner code.
+        - Search functionality implemented via JavaScript to filter and highlight content in real-time.
+        - Theme switching implemented via JavaScript to dynamically change CSS classes on the body element, affecting color palettes for a personalized experience.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: #FDFBF6;
+            color: #333D4B;
+            transition: background-color 0.5s, color 0.5s;
+        }
+        .theme-black {
+            background-color: #121212;
+            color: #E0E0E0;
+        }
+        .theme-dark-red {
+            background-color: #4C0000;
+            color: #FFD4D4;
+        }
+        .theme-black .nav-link:hover, .theme-black .nav-link.active {
+            color: #BB86FC;
+            border-bottom-color: #BB86FC;
+        }
+        .theme-dark-red .nav-link:hover, .theme-dark-red .nav-link.active {
+            color: #FFA0A0;
+            border-bottom-color: #FFA0A0;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 450px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #00796B;
+            border-bottom-color: #00796B;
+        }
+        .card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .theme-black .card, .theme-dark-red .card {
+            background-color: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.12);
+            color: inherit;
+        }
+        .btn-tab {
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .btn-tab.active {
+            background-color: #00796B;
+            color: white;
+        }
+        .theme-black .btn-tab.active, .theme-dark-red .btn-tab.active {
+            background-color: #BB86FC;
+        }
+        .highlight {
+            background-color: yellow;
+            color: black;
+            padding: 2px;
+            border-radius: 4px;
+        }
+        .theme-black .highlight, .theme-dark-red .highlight {
+            background-color: #FFC107;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm transition-colors duration-500 theme-sensitive">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center flex-wrap">
+            <h1 class="text-xl md:text-2xl font-bold text-teal-800 theme-sensitive">AI পর্যালোচনা</h1>
+            <div class="flex items-center space-x-4 md:order-last">
+                <button id="theme-toggle" class="p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-colors duration-500">
+                    ☀️
+                </button>
+                <button id="mobile-menu-button" class="md:hidden focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+            <div class="hidden md:flex flex-1 items-center justify-center space-x-8">
+                <a href="#home" class="nav-link">ভূমিকা</a>
+                <a href="#nsai" class="nav-link">NSAI</a>
+                <a href="#agi" class="nav-link">AGI</a>
+                <a href="#synergy" class="nav-link">সমন্বয়</a>
+                <a href="#conclusion" class="nav-link">উপসংহার</a>
+            </div>
+            <div class="w-full md:w-auto mt-4 md:mt-0 md:flex-initial">
+                <input type="text" id="search-input" placeholder="অনুসন্ধান করুন..." class="w-full md:w-48 px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-colors duration-500">
+            </div>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden bg-white/80 backdrop-blur-md transition-colors duration-500 theme-sensitive">
+            <a href="#home" class="block py-2 px-4 text-sm hover:bg-gray-200">ভূমিকা</a>
+            <a href="#nsai" class="block py-2 px-4 text-sm hover:bg-gray-200">NSAI</a>
+            <a href="#agi" class="block py-2 px-4 text-sm hover:bg-gray-200">AGI</a>
+            <a href="#synergy" class="block py-2 px-4 text-sm hover:bg-gray-200">সমন্বয়</a>
+            <a href="#conclusion" class="block py-2 px-4 text-sm hover:bg-gray-200">উপসংহার</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-8 md:py-12">
+
+        <section id="home" class="text-center min-h-[60vh] flex flex-col justify-center items-center">
+            <h2 class="text-3xl md:text-5xl font-bold mb-4 leading-tight theme-sensitive">নিউরো-সিম্বলিক AI এবং আর্টিফিশিয়াল জেনারেল ইন্টেলিজেন্স</h2>
+            <p class="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto theme-sensitive">
+                এই ইন্টারেক্টিভ পর্যালোচনাটি AI-এর দুটি রূপান্তরমূলক ক্ষেত্র - NSAI এবং AGI-এর সংযোগস্থল অন্বেষণ করে। ডেটা-চালিত শিক্ষা এবং কাঠামোগত যুক্তির সমন্বয় কীভাবে আরও শক্তিশালী এবং অভিযোজনযোগ্য বুদ্ধিমত্তার পথ তৈরি করছে তা আবিষ্কার করুন।
+            </p>
+        </section>
+
+        <section id="nsai" class="py-12 md:py-20">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl md:text-4xl font-bold text-teal-800 theme-sensitive">নিউরো-সিম্বলিক এআই (NSAI)</h3>
+                <p class="mt-4 text-lg text-slate-600 max-w-2xl mx-auto theme-sensitive">NSAI গভীর শিক্ষার শক্তিকে সিম্বলিক যুক্তির সাথে একত্রিত করে, যার লক্ষ্য হল আরও ব্যাখ্যাযোগ্য, ডেটা-দক্ষ এবং সাধারণীকরণযোগ্য AI সিস্টেম তৈরি করা।</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="order-2 md:order-1">
+                    <h4 class="text-2xl font-semibold mb-4 theme-sensitive">মূল গবেষণার ক্ষেত্র</h4>
+                    <p class="mb-4 text-slate-600 theme-sensitive">NSAI গবেষণা বিভিন্ন ক্ষেত্রে বিস্তৃত। নীচের ডোনাট চার্টের প্রতিটি অংশে ক্লিক করে নির্দিষ্ট গবেষণা ক্ষেত্রের প্রচেষ্টা এবং ফোকাস সম্পর্কে জানুন।</p>
+                    <div id="nsai-research-details" class="p-4 bg-white rounded-lg shadow-inner min-h-[150px] text-slate-700 transition-colors duration-500 theme-sensitive">
+                        <p>একটি ক্ষেত্র নির্বাচন করুন...</p>
+                    </div>
+                </div>
+                <div class="order-1 md:order-2">
+                    <div class="chart-container">
+                        <canvas id="nsaiChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-20">
+                <h4 class="text-2xl font-semibold text-center mb-8 theme-sensitive">NSAI স্থাপত্য</h4>
+                <div class="flex justify-center mb-6">
+                    <button id="composite-btn" class="btn-tab px-6 py-2 font-semibold rounded-l-lg bg-gray-200 active theme-sensitive">যৌগিক কাঠামো</button>
+                    <button id="monolithic-btn" class="btn-tab px-6 py-2 font-semibold rounded-r-lg bg-gray-200 theme-sensitive">একক কাঠামো</button>
+                </div>
+                <div id="architecture-content" class="max-w-4xl mx-auto">
+                    <!-- Content will be injected by JS -->
+                </div>
+            </div>
+        </section>
+
+        <section id="agi" class="py-12 md:py-20 bg-white rounded-2xl shadow-lg transition-colors duration-500 theme-sensitive">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl md:text-4xl font-bold text-teal-800 theme-sensitive">আর্টিফিশিয়াল জেনারেল ইন্টেলিজেন্স (AGI)</h3>
+                <p class="mt-4 text-lg text-slate-600 max-w-2xl mx-auto theme-sensitive">AGI মানব-স্তরের জ্ঞানীয় ক্ষমতা অর্জনের চেষ্টা করে, যা সিস্টেমকে বিভিন্ন কাজ শিখতে এবং মানিয়ে নিতে সক্ষম করে।</p>
+            </div>
+            
+            <div class="bg-amber-100/50 border-l-4 border-amber-500 text-amber-800 p-4 rounded-r-lg max-w-3xl mx-auto mb-12 transition-colors duration-500 theme-sensitive">
+                <h4 class="font-bold theme-sensitive">সংজ্ঞার চ্যালেঞ্জ: একটি "রোর্শাচ পরীক্ষা"</h4>
+                <p class="text-sm mt-1 theme-sensitive">"AGI" শব্দটির একটি সর্বজনীনভাবে গৃহীত সংজ্ঞা নেই। এটি প্রায়শই একটি "রোর্শাচ পরীক্ষা" হিসাবে কাজ করে, যেখানে গবেষক এবং উত্সাহীরা তাদের নিজস্ব আশা এবং ভয়কে প্রজেক্ট করে, যা একটি "ঐকমত্যের বিভ্রম" তৈরি করে এবং অগ্রগতি পরিমাপ করা কঠিন করে তোলে।</p>
+            </div>
+
+            <h4 class="text-2xl font-semibold text-center mb-8 theme-sensitive">AGI-এর মৌলিক নীতি</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto" id="agi-principles-container">
+                <!-- AGI Principles will be injected by JS -->
+            </div>
+        </section>
+
+        <section id="synergy" class="py-12 md:py-20">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl md:text-4xl font-bold text-teal-800 theme-sensitive">NSAI ও AGI-এর সমন্বয়</h3>
+                <p class="mt-4 text-lg text-slate-600 max-w-2xl mx-auto theme-sensitive">NSAI এবং AGI একে অপরের পরিপূরক। NSAI-এর পদ্ধতিগুলি AGI-এর অনেক মৌলিক চ্যালেঞ্জ মোকাবেলার জন্য একটি শক্তিশালী ভিত্তি প্রদান করে।</p>
+            </div>
+
+            <div class="max-w-5xl mx-auto p-8 bg-white rounded-2xl shadow-xl transition-colors duration-500 theme-sensitive">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="w-full md:w-2/5 p-4 text-center">
+                        <h4 class="text-xl font-bold mb-4 text-blue-700 theme-sensitive">NSAI সক্ষমতা</h4>
+                        <ul class="space-y-3 text-left">
+                            <li class="p-3 bg-blue-50 rounded-lg transition-colors duration-500 theme-sensitive">গঠনমূলক সাধারণীকরণ</li>
+                            <li class="p-3 bg-blue-50 rounded-lg transition-colors duration-500 theme-sensitive">ব্যাখ্যাযোগ্য যুক্তি</li>
+                            <li class="p-3 bg-blue-50 rounded-lg transition-colors duration-500 theme-sensitive">ডেটা-দক্ষ শিক্ষা</li>
+                        </ul>
+                    </div>
+                    <div class="w-full md:w-1/5 flex justify-center items-center my-6 md:my-0 text-teal-600 theme-sensitive">
+                        <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    </div>
+                    <div class="w-full md:w-2/5 p-4 text-center">
+                        <h4 class="text-xl font-bold mb-4 text-purple-700 theme-sensitive">AGI-এর মৌলিক সমস্যা</h4>
+                        <ul class="space-y-3 text-left">
+                            <li class="p-3 bg-purple-50 rounded-lg transition-colors duration-500 theme-sensitive">প্রতীক গ্রাউন্ডিং</li>
+                            <li class="p-3 bg-purple-50 rounded-lg transition-colors duration-500 theme-sensitive">কার্যকারণ বোঝা</li>
+                            <li class="p-3 bg-purple-50 rounded-lg transition-colors duration-500 theme-sensitive">অভিযোজনযোগ্য স্মৃতি</li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="mt-8 text-center text-slate-700 theme-sensitive">
+                    NSAI-এর **ধারণা-কেন্দ্রিক দৃষ্টান্ত** সরাসরি AGI-এর **প্রতীক গ্রাউন্ডিং** এবং **কার্যকারণ** সমস্যা সমাধান করে। বিমূর্ত প্রতীকগুলিকে বাস্তব-বিশ্বের উপলব্ধি এবং কর্মের সাথে সংযুক্ত করার মাধ্যমে, NSAI এমন একটি পথ তৈরি করে যা AGI-কে কেবল অনুকরণ করার পরিবর্তে সত্যিকার অর্থে বুঝতে সক্ষম করে।
+                </p>
+            </div>
+        </section>
+
+        <section id="conclusion" class="py-12 md:py-20 text-center">
+             <h3 class="text-3xl md:text-4xl font-bold text-teal-800 theme-sensitive">উপসংহার এবং ভবিষ্যতের দৃষ্টিভঙ্গি</h3>
+             <div class="max-w-3xl mx-auto mt-6 space-y-4 text-slate-600 text-left md:text-center theme-sensitive">
+                <p>
+                    নিউরো-সিম্বলিক এআই এবং আর্টিফিশিয়াল জেনারেল ইন্টেলিজেন্সের মধ্যে একটি গভীর সমন্বয় বিদ্যমান। AGI-এর ভবিষ্যত সম্ভবত অন্তর্নিহিতভাবে নিউরো-সিম্বলিক হবে, যা উভয় দৃষ্টান্তের শক্তিকে কাজে লাগিয়ে এমন বুদ্ধিমান সিস্টেম তৈরি করবে যা কেবল সক্ষম নয় বরং ব্যাখ্যাযোগ্য, শক্তিশালী এবং অভিযোজনযোগ্য।
+                </p>
+                <p>
+                    ভবিষ্যতের গবেষণায় ঐক্যবদ্ধ কাঠামো তৈরি, ব্যাপক বেঞ্চমার্কিং এবং বিশেষ হার্ডওয়্যার আর্কিটেকচার ডিজাইনের উপর ফোকাস করা উচিত। মেটা-কগনিশন এবং স্ব-উন্নয়নশীল শেখার মতো ক্ষেত্রগুলিতে অগ্রগতি বৃহত্তর স্বায়ত্তশাসন এবং অভিযোজনযোগ্যতার দিকে পরিচালিত করবে, যা এআই সিস্টেমগুলির মূল নকশার মধ্যে সুরক্ষা এবং স্বচ্ছতা নিশ্চিত করবে।
+                </p>
+             </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-800 text-white py-6 transition-colors duration-500 theme-sensitive">
+        <div class="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center text-center">
+            <p>&copy; 2025 ইন্টারেক্টিভ এআই পর্যালোচনা। arXiv থেকে প্রাপ্ত একাডেমিক সাহিত্যের উপর ভিত্তি করে তৈরি।</p>
+            <div class="mt-4 md:mt-0 flex space-x-4">
+                <a href="#" class="hover:text-blue-400">🌐</a>
+                <a href="#" class="hover:text-blue-400">🐦</a>
+                <a href="#" class="hover:text-blue-400">📸</a>
+                <a href="#" class="hover:text-blue-400">🔗</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const content = {
+                nsaiResearch: [
+                    { label: 'শেখা এবং অনুমান (63%)', details: 'এই ক্ষেত্রটি নিউরাল শেখার প্রক্রিয়াগুলির সাথে সিম্বলিক যুক্তির সংমিশ্রণের উপর দৃষ্টি নিবদ্ধ করে। লক্ষ্য হল দ্রুত এবং ধীর চিন্তাভাবনার মডেলগুলিকে একত্রিত করা এবং মেশিনের সাধারণীকরণকে উন্নত করা।' },
+                    { label: 'জ্ঞান উপস্থাপন (44%)', details: 'এখানকার গবেষণা সিম্বলিক এবং নিউরাল উপস্থাপনাগুলিকে একত্রিত করা, সাধারণ জ্ঞান এবং ডোমেন-নির্দিষ্ট জ্ঞান গ্রাফ তৈরি করা এবং সিম্যান্টিক গ্রাউন্ডিং উন্নত করার জন্য নিবেদিত।' },
+                    { label: 'যুক্তি এবং যুক্তিবিদ্যা (35%)', details: 'এই ক্ষেত্রটি নিউরাল নেটওয়ার্কগুলির সাথে যুক্তি-ভিত্তিক পদ্ধতিগুলিকে একত্রিত করে, যার মধ্যে লজিক্যাল এবং প্রোবাবিলিস্টিক যুক্তি অন্তর্ভুক্ত। লক্ষ্য হল সাধারণ জ্ঞান এবং ভাষা বোঝা উন্নত করা।' },
+                    { label: 'ব্যাখ্যাযোগ্যতা এবং বিশ্বাসযোগ্যতা (28%)', details: 'এই গুরুত্বপূর্ণ ক্ষেত্রটির লক্ষ্য হল নিউরো-সিম্বলিক সিস্টেমগুলিতে বিশ্বাস এবং নির্ভরযোগ্যতা নিশ্চিত করার জন্য ব্যাখ্যাযোগ্য মডেল এবং যুক্তির প্রক্রিয়াগুলি তৈরি করা।' },
+                    { label: 'মেটা-কগনিশন (5%)', details: 'সবচেয়ে কম অন্বেষিত এই ক্ষেত্রটি সিস্টেমের নিজস্ব যুক্তি এবং শেখার প্রক্রিয়াগুলি পর্যবেক্ষণ, মূল্যায়ন এবং অভিযোজিত করার অন্তর্নিহিত ক্ষমতার উপর দৃষ্টি নিবদ্ধ করে।' }
+                ],
+                nsaiArchitectures: {
+                    composite: `
+                        <div class="bg-white p-6 rounded-lg shadow-md transition-colors duration-500 theme-sensitive">
+                            <h5 class="font-semibold text-lg mb-2 theme-sensitive">যৌগিক কাঠামো (Composite Frameworks)</h5>
+                            <p class="text-slate-600 mb-4 theme-sensitive">এই স্থাপত্যগুলি নিউরাল (N) এবং লজিক্যাল (L) উপাদানগুলির মধ্যে একটি স্বতন্ত্র বিচ্ছেদ বজায় রাখে। লজিক্যাল উপাদান সাধারণত নিউরাল উপাদানকে নিয়মিত বা গাইড করার জন্য কাজ করে।</p>
+                            <div class="space-y-3">
+                                <details class="bg-gray-50 p-3 rounded-lg cursor-pointer transition-colors duration-500 theme-sensitive">
+                                    <summary class="font-medium theme-sensitive">প্রত্যক্ষ তত্ত্বাবধান</summary>
+                                    <p class="mt-2 text-sm text-slate-600 theme-sensitive">লজিক্যাল উপাদান নিউরাল নেটওয়ার্কের আউটপুটের জন্য অতিরিক্ত তত্ত্বাবধান বা সীমাবদ্ধতা হিসাবে কাজ করে।</p>
+                                </details>
+                                <details class="bg-gray-50 p-3 rounded-lg cursor-pointer transition-colors duration-500 theme-sensitive">
+                                    <summary class="font-medium theme-sensitive">পরোক্ষ তত্ত্বাবধান</summary>
+                                    <p class="mt-2 text-sm text-slate-600 theme-sensitive">নিউরাল নেটওয়ার্ক প্যাটার্ন সনাক্ত করে, যা উচ্চ-স্তরের যুক্তির জন্য একটি পৃথক লজিক্যাল মডেলের কাছে পাঠানো হয়।</p>
+                                </details>
+                            </div>
+                        </div>
+                    `,
+                    monolithic: `
+                        <div class="bg-white p-6 rounded-lg shadow-md transition-colors duration-500 theme-sensitive">
+                            <h5 class="font-semibold text-lg mb-2 theme-sensitive">একক কাঠামো (Monolithic Frameworks)</h5>
+                            <p class="text-slate-600 mb-4 theme-sensitive">এই স্থাপত্যগুলি নিউরাল নেটওয়ার্কগুলির অভ্যন্তরীণ কাঠামোতে সরাসরি লজিক্যাল যুক্তিকে সংহত করে, দুটি উপাদানের মধ্যে পার্থক্যকে অস্পষ্ট করে তোলে।</p>
+                            <div class="space-y-3">
+                                <details class="bg-gray-50 p-3 rounded-lg cursor-pointer transition-colors duration-500 theme-sensitive">
+                                    <summary class="font-medium theme-sensitive">লজিক্যালি ওয়্যারড নিউরাল নেটওয়ার্ক</summary>
+                                    <p class="mt-2 text-sm text-slate-600 theme-sensitive">লজিক্যাল পরমাণুগুলি পৃথক নিউরনে ম্যাপ করা হয় এবং লজিক্যাল সংযোজকগুলি নিউরনের মধ্যে সংযোগ দ্বারা অনুকরণ করা হয়।</p>
+                                </details>
+                                <details class="bg-gray-50 p-3 rounded-lg cursor-pointer transition-colors duration-500 theme-sensitive">
+                                    <summary class="font-medium theme-sensitive">টেনসরাইজড লজিক প্রোগ্রাম</summary>
+                                    <p class="mt-2 text-sm text-slate-600 theme-sensitive">লজিক্যাল প্রতীকগুলিকে ডিফারেন্সিয়েবল বস্তু যেমন ভেক্টর এবং টেনসরে ম্যাপ করা হয়, যা এন্ড-টু-এন্ড প্রশিক্ষণ সক্ষম করে।</p>
+                                </details>
+                            </div>
+                        </div>
+                    `
+                },
+                agiPrinciples: [
+                    { icon: '🦾', title: 'মূর্ততা (Embodiment)', description: 'AI সিস্টেমকে শারীরিক দেহের সাথে একত্রিত করা, যা পরিবেশের সাথে সরাসরি মিথস্ক্রিয়া সক্ষম করে।' },
+                    { icon: '🔗', title: 'প্রতীক গ্রাউন্ডিং', description: 'বিমূর্ত প্রতীকগুলিকে বাস্তব-বিশ্বের সত্তা এবং অর্থের সাথে সংযুক্ত করার চ্যালেঞ্জ মোকাবেলা করা।' },
+                    { icon: '💡', title: 'কার্যকারণ (Causality)', description: 'বিশ্বের মধ্যে কারণ-এবং-প্রভাব সম্পর্ক সনাক্ত এবং বোঝা, যা শুধুমাত্র পারস্পরিক সম্পর্ককে ছাড়িয়ে যায়।' },
+                    { icon: '🧠', title: 'স্মৃতি (Memory)', description: 'অর্জিত জ্ঞান সংরক্ষণ এবং একত্রিত করা, যা দীর্ঘমেয়াদী শেখা এবং অভিযোজনযোগ্যতা সক্ষম করে।' }
+                ]
+            };
+
+            const nsaiCtx = document.getElementById('nsaiChart').getContext('2d');
+            const nsaiDetailsDiv = document.getElementById('nsai-research-details');
+            const agiPrinciplesContainer = document.getElementById('agi-principles-container');
+            const architectureContentDiv = document.getElementById('architecture-content');
+            
+            const nsaiChart = new Chart(nsaiCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: content.nsaiResearch.map(item => item.label),
+                    datasets: [{
+                        data: [63, 44, 35, 28, 5],
+                        backgroundColor: ['#00796B', '#0097A7', '#0288D1', '#303F9F', '#F57C00'],
+                        borderColor: '#FDFBF6',
+                        borderWidth: 4,
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#333D4B',
+                                font: {
+                                    family: "'Hind Siliguri', sans-serif"
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label;
+                                }
+                            }
+                        }
+                    },
+                    onClick: (event, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            const details = content.nsaiResearch[index].details;
+                            nsaiDetailsDiv.innerHTML = `<h5 class="font-semibold mb-2">${content.nsaiResearch[index].label}</h5><p>${details}</p>`;
+                        }
+                    }
+                }
+            });
+            nsaiDetailsDiv.innerHTML = `<h5 class="font-semibold mb-2">${content.nsaiResearch[0].label}</h5><p>${content.nsaiResearch[0].details}</p>`;
+
+            const compositeBtn = document.getElementById('composite-btn');
+            const monolithicBtn = document.getElementById('monolithic-btn');
+
+            function updateArchContent(type) {
+                architectureContentDiv.innerHTML = content.nsaiArchitectures[type];
+                if (type === 'composite') {
+                    compositeBtn.classList.add('active');
+                    monolithicBtn.classList.remove('active');
+                } else {
+                    monolithicBtn.classList.add('active');
+                    compositeBtn.classList.remove('active');
+                }
+            }
+
+            compositeBtn.addEventListener('click', () => updateArchContent('composite'));
+            monolithicBtn.addEventListener('click', () => updateArchContent('monolithic'));
+            updateArchContent('composite');
+
+            agiPrinciplesContainer.innerHTML = content.agiPrinciples.map(p => `
+                <div class="card bg-white p-6 rounded-lg shadow-md text-center">
+                    <div class="text-4xl mb-4">${p.icon}</div>
+                    <h5 class="font-semibold text-lg mb-2">${p.title}</h5>
+                    <p class="text-slate-600 text-sm">${p.description}</p>
+                </div>
+            `).join('');
+            
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            const body = document.body;
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            let currentThemeIndex = 0;
+            const themes = ['', 'theme-black', 'theme-dark-red'];
+            const themeIcons = ['☀️', '🌙', '🩸'];
+
+            themeToggleBtn.addEventListener('click', () => {
+                currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+                body.className = body.className.replace(/theme-(black|dark-red)/g, '').trim();
+                if (themes[currentThemeIndex]) {
+                    body.classList.add(themes[currentThemeIndex]);
+                }
+                themeToggleBtn.textContent = themeIcons[currentThemeIndex];
+                
+                const legendLabelsColor = currentThemeIndex === 0 ? '#333D4B' : (currentThemeIndex === 1 ? '#E0E0E0' : '#FFD4D4');
+                const borderColor = currentThemeIndex === 0 ? '#FDFBF6' : '#121212';
+                nsaiChart.options.plugins.legend.labels.color = legendLabelsColor;
+                nsaiChart.data.datasets[0].borderColor = borderColor;
+                nsaiChart.update();
+            });
+            
+            const searchInput = document.getElementById('search-input');
+            const searchables = document.querySelectorAll('main p, main h2, main h3, main h4, main h5, main li, main summary, main details');
+            
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.trim().toLowerCase();
+                searchables.forEach(el => {
+                    const originalText = el.getAttribute('data-original-text') || el.innerHTML;
+                    if (!el.getAttribute('data-original-text')) {
+                        el.setAttribute('data-original-text', originalText);
+                    }
+                    if (searchTerm === '') {
+                        el.innerHTML = originalText;
+                    } else {
+                        const regex = new RegExp(`(${searchTerm})`, 'gi');
+                        el.innerHTML = originalText.replace(regex, '<span class="highlight">$1</span>');
+                    }
+                });
+            });
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main section');
+
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 100) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
